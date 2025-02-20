@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  database:
+    build:
+      context: ./database
+    container_name: blog-db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: blog_db
+
+  backend:
+    build:
+      context: ./backend
+    container_name: blog-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_HOST=database
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=blog_db
+    depends_on:
+      - database
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: blog-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+networks:
+  blog-network:
+    driver: bridge
