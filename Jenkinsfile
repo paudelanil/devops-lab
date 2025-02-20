@@ -49,7 +49,7 @@ pipeline {
             // Clean up any running containers if necessary
             script {
                 echo "Checking running containers..."
-                agrish "docker-compose -f ${DOCKER_COMPOSE_FILE} ps"
+                sh "docker-compose -f ${DOCKER_COMPOSE_FILE} ps"
             }
         }
     }
