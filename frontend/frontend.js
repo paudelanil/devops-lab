@@ -23,6 +23,7 @@ app.get('/', async (req, res) => {
             <html>
             <head>
                 <title>Blog List</title>
+                <h1> DevOps Project WOrk </h1>
                 <link rel="stylesheet" href="/styles.css" />
             </head>
             <body>
