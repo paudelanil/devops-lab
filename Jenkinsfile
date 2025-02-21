@@ -9,7 +9,7 @@ pipeline {
         stage('Clone Source Code') {
             steps {
                 // Clone the source code from the configured repository
-                git url: 'https://github.com/your-repo/your-project.git', branch: 'main'
+                git url: 'https://github.com/paudelanil/devops-lab.git', branch: 'main'
             }
         }
 
@@ -49,7 +49,7 @@ pipeline {
             // Clean up any running containers if necessary
             script {
                 echo "Checking running containers..."
-                agrish "docker-compose -f ${DOCKER_COMPOSE_FILE} ps"
+                sh "docker-compose -f ${DOCKER_COMPOSE_FILE} ps"
             }
         }
     }
