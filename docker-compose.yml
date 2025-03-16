@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   database:
-    build:
-      context: ./database
+    image: paudelanil9/database-app:latest
     container_name: blog-db
     ports:
       - "3307:3306"
@@ -12,10 +11,11 @@ services:
       MYSQL_DATABASE: blog_db
     volumes:
       - db_data:/var/lib/mysql  # Persistent volume for database storage
+    networks:
+      - blog-network
 
   backend:
-    build:
-      context: ./backend
+    image: paudelanil9/backend-app:latest
     container_name: blog-backend
     ports:
       - "5000:5000"
@@ -26,15 +26,19 @@ services:
       - DATABASE_NAME=blog_db
     depends_on:
       - database
+    networks:
+      - blog-network
 
   frontend:
-    build:
-      context: ./frontend
+    image: paudelanil9/frontend-app:latest
     container_name: blog-frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - blog-network
+
 networks:
   blog-network:
     driver: bridge
