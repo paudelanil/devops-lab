@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Chiya Chautari</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1> Chiya Chautar</h1>
+        <p>Connect with random strangers and start chatting!</p>
+        <button id="startChat" class="btn">Start your guff</button>
+    </div>
+
+    <script>
+        document.getElementById('startChat').addEventListener('click', async () => {
+            try {
+                // Get a new user ID from the backend
+                const response = await fetch('/api/new-user');
+                const data = await response.json();
+                
+                // Store the user ID in session storage
+                sessionStorage.setItem('userId', data.user_id);
+                
+                // Redirect to the chat page
+                window.location.href = '/chat';
+            } catch (error) {
+                console.error('Error starting chat:', error);
+                alert('Failed to start chat. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

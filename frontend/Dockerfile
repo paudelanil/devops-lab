@@ -1,15 +1,12 @@
-FROM node:16
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files first for better layer caching
-COPY package*.json ./
+COPY package.json .
+RUN npm install
 
-RUN npm install --production
+COPY . .
 
-# Copy all other files
-COPY  public ./public
-COPY frontend.js .
+EXPOSE 3000
 
-
-CMD ["node", "frontend.js"]
+CMD ["npm", "start"]

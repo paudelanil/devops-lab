@@ -1,139 +1,154 @@
-/* styles.css */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
+/* public/styles.css */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
-    padding: 2rem;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 20px;
 }
 
-h1 {
-    color: #2c3e50;
+h1, h2 {
     text-align: center;
-    margin-bottom: 2rem;
-    font-weight: 600;
+    margin-bottom: 20px;
+    color: #2c3e50;
 }
 
-.blog-list {
-    list-style: none;
-    margin-bottom: 2rem;
+p {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-.blog-item {
-    background: #ffffff;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.btn:hover {
+    background-color: #2980b9;
+}
+
+.btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+#startChat {
+    display: block;
+    margin: 0 auto;
+    font-size: 18px;
+    padding: 12px 30px;
+}
+
+.chat-header {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
-    transition: transform 0.2s;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
 }
 
-.blog-item:hover {
-    transform: translateY(-2px);
+.chat-header h2 {
+    margin: 0;
 }
 
-.blog-item strong {
-    color: #3498db;
-    font-size: 1.1rem;
-    margin-right: 1rem;
+#statusIndicator {
+    font-size: 14px;
+    color: #7f8c8d;
 }
 
-.blog-item p {
-    flex-grow: 1;
-    color: #34495e;
+.chat-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-.delete-form {
-    margin-left: 1rem;
+.chat-messages {
+    height: 400px;
+    padding: 15px;
+    overflow-y: auto;
 }
 
-.delete-button {
-    background: #e74c3c;
+.message {
+    padding: 10px 15px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.message.self {
+    background-color: #3498db;
     color: white;
-    border: none;
-    padding: 0.5rem 1rem;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+.message.other {
+    background-color: #eee;
+    color: #333;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+.message.system {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    text-align: center;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
+    margin: 10px auto;
+    max-width: 90%;
+    font-style: italic;
 }
 
-.delete-button:hover {
-    background: #c0392b;
-}
-
-.blog-form {
+.chat-input {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    padding: 15px;
+    border-top: 1px solid #ddd;
 }
 
-.input-field {
-    padding: 0.8rem;
-    border: 2px solid #dfe6e9;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
+#messageInput {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    margin-right: 10px;
+    font-size: 16px;
 }
 
-.input-field:focus {
-    outline: none;
-    border-color: #3498db;
+#messageInput:disabled {
+    background-color: #f5f5f5;
 }
 
-.submit-button {
-    background: #3498db;
-    color: white;
-    padding: 1rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s;
+.send-btn {
+    border-radius: 30px;
+    padding: 10px 20px;
 }
 
-.submit-button:hover {
-    background: #2980b9;
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 1rem;
+@media (max-width: 600px) {
+    .chat-messages {
+        height: 350px;
     }
     
-    .container {
-        padding: 1rem;
-    }
-    
-    .blog-item {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .delete-form {
-        margin-left: 0;
-        width: 100%;
-    }
-    
-    .delete-button {
-        width: 100%;
+    .message {
+        max-width: 90%;
     }
 }

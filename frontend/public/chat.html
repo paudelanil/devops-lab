@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="chat-header">
+            <h2>Chiyaa Chatuari</h2>
+            <div id="statusIndicator">Finding a partner...</div>
+            <button id="newChat" class="btn">New Chat</button>
+        </div>
+        
+        <div class="chat-container">
+            <div id="chatMessages" class="chat-messages"></div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type a message..." disabled>
+                <button id="sendMessage" class="btn send-btn" disabled>Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let socket;
+        let userId;
+        let partnerId;
+
+        // Get user ID from session storage
+        userId = sessionStorage.getItem('userId');
+        if (!userId) {
+            window.location.href = '/';
+        }
+
+        // Connect to the WebSocket
+        function connectWebSocket() {
+            const backendUrl = window.location.hostname === 'localhost' ? 
+                `ws://${window.location.hostname}:8000` : 
+                `wss://${window.location.hostname}/api`;
+            
+            socket = new WebSocket(`${backendUrl}/ws/${userId}`);
+            
+            socket.onopen = () => {
+                console.log('WebSocket connection established');
+                document.getElementById('statusIndicator').textContent = 'Looking for a partner...';
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('Message received:', data);
+                
+                switch (data.type) {
+                    case 'waiting':
+                        document.getElementById('statusIndicator').textContent = 'Waiting for a partner...';
+                        break;
+                    
+                    case 'connected':
+                        partnerId = data.partner_id;
+                        document.getElementById('statusIndicator').textContent = 'Connected to a stranger!';
+                        document.getElementById('messageInput').disabled = false;
+                        document.getElementById('sendMessage').disabled = false;
+                        addSystemMessage('You are connected to a stranger. Say hello!');
+                        break;
+                    
+                    case 'chat_message':
+                        addMessage(data.sender_id, data.message, false);
+                        break;
+                    
+                    case 'partner_disconnected':
+                        document.getElementById('statusIndicator').textContent = 'Partner disconnected';
+                        document.getElementById('messageInput').disabled = true;
+                        document.getElementById('sendMessage').disabled = true;
+                        addSystemMessage('Your chat partner disconnected. Click "New Chat" to find someone else.');
+                        break;
+                }
+            };
+
+            socket.onclose = () => {
+                console.log('WebSocket connection closed');
+                document.getElementById('statusIndicator').textContent = 'Disconnected';
+                document.getElementById('messageInput').disabled = true;
+                document.getElementById('sendMessage').disabled = true;
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                document.getElementById('statusIndicator').textContent = 'Connection error';
+                document.getElementById('messageInput').disabled = true;
+                document.getElementById('sendMessage').disabled = true;
+            };
+        }
+
+        // Add a message to the chat
+        function addMessage(senderId, message, isSelf) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isSelf ? 'message self' : 'message other';
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Add a system message
+        function addSystemMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message system';
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Send a message
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (message && socket && socket.readyState === WebSocket.OPEN) {
+                const messageData = {
+                    type: 'chat_message',
+                    message: message
+                };
+                
+                socket.send(JSON.stringify(messageData));
+                addMessage(userId, message, true);
+                messageInput.value = '';
+            }
+        }
+
+        // Send message on button click
+        document.getElementById('sendMessage').addEventListener('click', sendMessage);
+
+        // Send message on Enter key
+        document.getElementById('messageInput').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Start a new chat
+        document.getElementById('newChat').addEventListener('click', () => {
+            if (socket) {
+                // Send disconnect message
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ type: 'disconnect' }));
+                }
+                socket.close();
+            }
+            
+            // Clear chat messages
+            document.getElementById('chatMessages').innerHTML = '';
+            
+            // Reconnect
+            connectWebSocket();
+        });
+
+        // Connect when the page loads
+        window.addEventListener('load', connectWebSocket);
+    </script>
+</body>
+</html>

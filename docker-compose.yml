@@ -1,47 +1,42 @@
-version: '3.8'
-
+version: '3'
 services:
-  database:
-    image: paudelanil9/database-app:latest
-    container_name: blog-db
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: blog_db
-    volumes:
-      - db_data:/var/lib/mysql  # Persistent volume for database storage
-    networks:
-      - blog-network
-
-  backend:
-    image: paudelanil9/backend-app:latest
-    container_name: blog-backend
-    ports:
-      - "5000:5000"
-    environment:
-      - DATABASE_HOST=database
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD=password
-      - DATABASE_NAME=blog_db
-    depends_on:
-      - database
-    networks:
-      - blog-network
-
   frontend:
-    image: paudelanil9/frontend-app:latest
-    container_name: blog-frontend
+    build: ./frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      - BACKEND_URL=http://backend:8000
     networks:
-      - blog-network
+      - chat-network
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mysql://root:password@db:3306/chat_db
+    networks:
+      - chat-network
+
+  db:
+    build: ./database
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=chat_db
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - chat-network
 
 networks:
-  blog-network:
+  chat-network:
     driver: bridge
-    
+
 volumes:
-  db_data:
+  db-data:
