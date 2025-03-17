@@ -39,7 +39,7 @@
         function connectWebSocket() {
             const backendUrl = window.location.hostname === 'localhost' ? 
                 `ws://${window.location.hostname}:8000` : 
-                `wss://${window.location.hostname}/api`;
+                `wss://${window.location.hostname}:8000`;
             
             socket = new WebSocket(`${backendUrl}/ws/${userId}`);
             
