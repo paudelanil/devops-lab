@@ -37,9 +37,10 @@
 
         // Connect to the WebSocket
         function connectWebSocket() {
-            const backendUrl = window.location.hostname === 'localhost' ? 
-                `ws://${window.location.hostname}:8000` : 
-                `wss://${window.location.hostname}:8000`;
+            // const backendUrl = window.location.hostname === 'localhost' ? 
+            //     `ws://${window.location.hostname}:8000` : 
+            //     `wss://${window.location.hostname}:8000`;
+            const backendUrl = `ws://${window.location.hostname}:8000`; // Use the correct IP/hostname and por
             
             socket = new WebSocket(`${backendUrl}/ws/${userId}`);
             
