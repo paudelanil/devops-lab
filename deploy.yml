@@ -1,0 +1,91 @@
+---
+- hosts: docker_hosts
+  become: true
+  vars:
+    backend_image: paudelanil9/backend-app:latest
+    frontend_image: paudelanil9/frontend-app:latest
+    database_image: paudelanil9/database-app:latest
+
+  tasks:
+    - name: Pull database image
+      community.docker.docker_image:
+        name: "{{ database_image }}"
+        source: pull
+        force_source: yes
+
+    - name: Pull backend image
+      community.docker.docker_image:
+        name: "{{ backend_image }}"
+        source: pull
+        force_source: yes
+
+    - name: Pull frontend image
+      community.docker.docker_image:
+        name: "{{ frontend_image }}"
+        source: pull
+        force_source: yes
+
+    - name: Create docker network
+      community.docker.docker_network:
+        name: chat-network
+        driver: bridge
+        state: present
+
+    - name: Stop and remove existing database container
+      community.docker.docker_container:
+        name: db
+        state: absent
+      ignore_errors: yes
+
+    - name: Stop and remove existing backend container
+      community.docker.docker_container:
+        name: backend
+        state: absent
+      ignore_errors: yes
+
+    - name: Stop and remove existing frontend container
+      community.docker.docker_container:
+        name: frontend
+        state: absent
+      ignore_errors: yes
+
+    - name: Deploy database container
+      community.docker.docker_container:
+        name: db
+        image: "{{ database_image }}"
+        state: started
+        restart_policy: always
+        networks:
+          - name: chat-network
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: chat_db
+        volumes:
+          - db-data:/var/lib/mysql
+
+    - name: Deploy backend container
+      community.docker.docker_container:
+        name: backend
+        image: "{{ backend_image }}"
+        state: started
+        restart_policy: always
+        networks:
+          - name: chat-network
+        ports:
+          - "8000:8000"
+        env:
+          DATABASE_URL: mysql://root:password@db:3306/chat_db
+
+    - name: Deploy frontend container
+      community.docker.docker_container:
+        name: frontend
+        image: "{{ frontend_image }}"
+        state: started
+        restart_policy: always
+        networks:
+          - name: chat-network
+        ports:
+          - "3000:3000"
+        env:
+          BACKEND_URL: http://backend:8000
+          NODE_ENV: production
