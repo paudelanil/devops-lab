@@ -1,6 +1,4 @@
----
-- hosts: docker_hosts
-  become: true
+- hosts: localhost
   vars:
     backend_image: paudelanil9/backend-app:latest
     frontend_image: paudelanil9/frontend-app:latest
